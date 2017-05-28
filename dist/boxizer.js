@@ -12,14 +12,14 @@ function boxesMatchSize(a, b) {
   return a.width === b.width && a.height === b.height
 }
 
-function BoundingBoxWatcher(element, handler, exact = false) {
+function BoundingBoxSubscription(element, handler, exact = false) {
   this._box = element.getBoundingClientRect();
   this._element = element;
   this._handler = handler;
   this._exact = exact;
 }
 
-BoundingBoxWatcher.prototype.check = function check() {
+BoundingBoxSubscription.prototype.check = function check() {
   var _box = this._element.getBoundingClientRect();
   var boxesMatch = this._exact ? boxesMatchExact : boxesMatchSize;
   if (boxesMatch(_box, this._box) === false) {
@@ -32,15 +32,19 @@ BoundingBoxWatcher.prototype.check = function check() {
   this._box = _box;
 };
 
-function Boxizer ({ numChunks = 1 } = {}) {
+var MAX_CHECKS_PER_FRAME = 1028;
+
+function Boxizer ({ frameLimit = MAX_CHECKS_PER_FRAME } = {}) {
   this._subscriptions = [];
-  this._numChunks = numChunks;
+  this._frameLimit = frameLimit;
+  this._numChunks = 1;
   this._frame = 0;
   this.tick = this.tick.bind(this);
 }
 
 Boxizer.prototype.subscribe = function subscribe(element, handler, exact = false) {
-  this._subscriptions.push(new BoundingBoxWatcher(element, handler, exact));
+  this._subscriptions.push(new BoundingBoxSubscription(element, handler, exact));
+  this._numChunks = Math.ceil(this._subscriptions.length / this._frameLimit);
   if (!this._unloop) {
     this._unloop = cloop.loop(this.tick);
   }
@@ -48,62 +52,25 @@ Boxizer.prototype.subscribe = function subscribe(element, handler, exact = false
 };
 
 Boxizer.prototype.removeHandler = function removeHandler(handler) {
-  this._subscriptions.filter(function(h) { return w._handler !== handler });
+  this._subscriptions = this._subscriptions.filter(function(sub) { return sub._handler !== handler });
+  this._numChunks = Math.ceil(this._subscriptions.length / this._frameLimit);
   if (this._subscriptions.length === 0 && this._unloop) {
     this._unloop();
     this._unloop = null;
   }
 };
 
-Boxizer.prototype.tick = function tickBoxizer() {
-  let f = this._frame;
-  for (var i = 0; i < this._subscriptions.length; i++) {
-    ++f;
-    if (f % this._numChunks === 0) {
-      this._subscriptions[i].check();
-    }
-    this._frame = (this._frame + 1) % this._numChunks;
+Boxizer.prototype.tick = function tick() {
+  for (var i = this._frame; i < this._subscriptions.length; i += this._numChunks) {
+    this._subscriptions[i].check();
   }
-};
-
-function Boxizer$1 ({ numChunks = 1 } = {}) {
-  this._subscriptions = [];
-  this._numChunks = numChunks;
-  this._frame = 0;
-  this.tick = this.tick.bind(this);
-}
-
-Boxizer$1.prototype.subscribe = function subscribe(element, handler, exact = false) {
-  this._subscriptions.push(new BoundingBoxWatcher(element, handler, exact));
-  if (!this._unloop) {
-    this._unloop = cloop.loop(this.tick);
-  }
-  return this.removeHandler.bind(this, handler)
-};
-
-Boxizer$1.prototype.removeHandler = function removeHandler(handler) {
-  this._subscriptions.filter(function(h) { return w._handler !== handler });
-  if (this._subscriptions.length === 0 && this._unloop) {
-    this._unloop();
-    this._unloop = null;
-  }
-};
-
-Boxizer$1.prototype.tick = function tickBoxizer() {
-  let f = this._frame;
-  for (var i = 0; i < this._subscriptions.length; i++) {
-    ++f;
-    if (f % this._numChunks === 0) {
-      this._subscriptions[i].check();
-    }
-    this._frame = (this._frame + 1) % this._numChunks;
-  }
+  this._frame = (this._frame + 1) % this._numChunks;
 };
 
 var singleton;
 function getInstance() {
   if (!singleton) {
-    singleton = new Boxizer$1();
+    singleton = new Boxizer();
   }
   return singleton
 }

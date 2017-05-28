@@ -1,15 +1,19 @@
 import { loop } from 'cloop'
-import { BoundingBoxWatcher } from './BoundingBoxWatcher'
+import { BoundingBoxSubscription } from './BoundingBoxSubscription'
 
-export function Boxizer ({ numChunks = 1 } = {}) {
+var MAX_CHECKS_PER_FRAME = 1028
+
+export function Boxizer ({ frameLimit = MAX_CHECKS_PER_FRAME } = {}) {
   this._subscriptions = []
-  this._numChunks = numChunks
+  this._frameLimit = frameLimit
+  this._numChunks = 1
   this._frame = 0
   this.tick = this.tick.bind(this)
 }
 
 Boxizer.prototype.subscribe = function subscribe(element, handler, exact = false) {
-  this._subscriptions.push(new BoundingBoxWatcher(element, handler, exact))
+  this._subscriptions.push(new BoundingBoxSubscription(element, handler, exact))
+  this._numChunks = Math.ceil(this._subscriptions.length / this._frameLimit)
   if (!this._unloop) {
     this._unloop = loop(this.tick)
   }
@@ -17,20 +21,17 @@ Boxizer.prototype.subscribe = function subscribe(element, handler, exact = false
 }
 
 Boxizer.prototype.removeHandler = function removeHandler(handler) {
-  this._subscriptions.filter(function(h) { return w._handler !== handler })
+  this._subscriptions = this._subscriptions.filter(function(sub) { return sub._handler !== handler })
+  this._numChunks = Math.ceil(this._subscriptions.length / this._frameLimit)
   if (this._subscriptions.length === 0 && this._unloop) {
     this._unloop()
     this._unloop = null
   }
 }
 
-Boxizer.prototype.tick = function tickBoxizer() {
-  let f = this._frame
-  for (var i = 0; i < this._subscriptions.length; i++) {
-    ++f
-    if (f % this._numChunks === 0) {
-      this._subscriptions[i].check()
-    }
-    this._frame = (this._frame + 1) % this._numChunks
+Boxizer.prototype.tick = function tick() {
+  for (var i = this._frame; i < this._subscriptions.length; i += this._numChunks) {
+    this._subscriptions[i].check()
   }
+  this._frame = (this._frame + 1) % this._numChunks
 }
