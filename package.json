@@ -1,0 +1,21 @@
+{
+  "name": "boxizer",
+  "version": "0.0.0",
+  "description": "Subscribe to changes in an element's bounding box",
+  "main": "dist/boxizer.js",
+  "module": "src/index.js",
+  "scripts": {
+    "test": "jest",
+    "build": "rollup -c"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^20.0.4",
+    "rollup": "^0.41.6",
+    "rollup-plugin-node-resolve": "^3.0.0"
+  },
+  "dependencies": {
+    "cloop": "^0.1.1"
+  }
+}
