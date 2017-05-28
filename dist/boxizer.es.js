@@ -1,8 +1,4 @@
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('cloop')) :
-	typeof define === 'function' && define.amd ? define(['exports', 'cloop'], factory) :
-	(factory((global.boxizer = global.boxizer || {}),global.cloop));
-}(this, (function (exports,cloop) { 'use strict';
+import { loop } from 'cloop';
 
 function boxesMatchExact(a, b) {
   return a.left === b.left && a.top === b.top && a.bottom === b.bottom && a.right === b.right
@@ -42,7 +38,7 @@ function Boxizer ({ numChunks = 1 } = {}) {
 Boxizer.prototype.subscribe = function subscribe(element, handler, exact = false) {
   this._subscriptions.push(new BoundingBoxWatcher(element, handler, exact));
   if (!this._unloop) {
-    this._unloop = cloop.loop(this.tick);
+    this._unloop = loop(this.tick);
   }
   return this.removeHandler.bind(this, handler)
 };
@@ -76,7 +72,7 @@ function Boxizer$1 ({ numChunks = 1 } = {}) {
 Boxizer$1.prototype.subscribe = function subscribe(element, handler, exact = false) {
   this._subscriptions.push(new BoundingBoxWatcher(element, handler, exact));
   if (!this._unloop) {
-    this._unloop = cloop.loop(this.tick);
+    this._unloop = loop(this.tick);
   }
   return this.removeHandler.bind(this, handler)
 };
@@ -112,9 +108,4 @@ function subscribe(element, cb) {
   return getInstance().subscribe(element, cb)
 }
 
-exports.Boxizer = Boxizer;
-exports.subscribe = subscribe;
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-})));
+export { Boxizer, subscribe };

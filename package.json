@@ -1,9 +1,9 @@
 {
   "name": "boxizer",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Subscribe to changes in an element's bounding box",
   "main": "dist/boxizer.js",
-  "module": "src/index.js",
+  "module": "dist/index.es.js",
   "scripts": {
     "test": "jest",
     "build": "rollup -c"
