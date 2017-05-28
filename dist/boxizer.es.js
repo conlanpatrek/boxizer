@@ -15,7 +15,7 @@ function BoundingBoxWatcher(element, handler, exact = false) {
   this._exact = exact;
 }
 
-BoundingBoxWatcher.check = function check() {
+BoundingBoxWatcher.prototype.check = function check() {
   var _box = this._element.getBoundingClientRect();
   var boxesMatch = this._exact ? boxesMatchExact : boxesMatchSize;
   if (boxesMatch(_box, this._box) === false) {
