@@ -1,6 +1,6 @@
 {
   "name": "boxizer",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Subscribe to changes in an element's bounding box",
   "repository": "conlanpatrek/boxizer",
   "main": "dist/boxizer.js",
