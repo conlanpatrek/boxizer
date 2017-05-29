@@ -2,14 +2,16 @@
   "name": "boxizer",
   "version": "1.0.0",
   "description": "Subscribe to changes in an element's bounding box",
+  "repository": "conlanpatrek/boxizer",
   "main": "dist/boxizer.js",
   "module": "dist/index.es.js",
+  "author": "Conlan Patrek Craft",
   "scripts": {
     "test": "jest",
     "build": "rollup -c"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "jest": "^20.0.4",
     "rollup": "^0.41.6",

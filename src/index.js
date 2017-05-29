@@ -1,2 +1,2 @@
 export { Boxizer } from './Boxizer'
-export { subscribe } from './singleton'
+export { subscribe, unsubscribe } from './singleton'
