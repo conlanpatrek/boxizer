@@ -1,7 +1,7 @@
 import { loop } from 'cloop'
 import { BoundingBoxSubscription } from './BoundingBoxSubscription'
 
-var MAX_CHECKS_PER_FRAME = 1028
+var MAX_CHECKS_PER_FRAME = 1024
 
 export function Boxizer ({ frameLimit = MAX_CHECKS_PER_FRAME } = {}) {
   this._subscriptions = []
@@ -12,7 +12,7 @@ export function Boxizer ({ frameLimit = MAX_CHECKS_PER_FRAME } = {}) {
 }
 
 Boxizer.prototype.subscribe = function subscribe(element, handler, options) {
-  let subscription = this._subscriptions.find(function (sub) { return sub.element === element })
+  var subscription = this._subscriptions.find(function (sub) { return sub.element === element })
   if (!subscription) {
     subscription = new BoundingBoxSubscription(element)
     this._subscriptions.push(subscription)

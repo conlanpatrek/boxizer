@@ -33,55 +33,45 @@ subscribe(
 Note that a bounding box is relative to the viewport, so scroling will be considered a positional change.
 
 ## API
-### subscribe( \<Element> element, \<Function> handler, [\<Object> options] )
-Subcribe to changes in an element's width, height, or position using a singleton instance of the Boxizer class. See Boxizer.subscribe() for more information.
+### subscribe(element, handler, [options])
+Subcribe to changes in an element's width, height, or position using a singleton instance of the Boxizer class. See Boxizer.prototype.subscribe() for more information.
 
 ---
 
-### unsubscribe( \<Element> element, \<Function> handler )
-Unsubscribe the provided handler from updates on a given element. See Boxizer.unsubscribe() for more information.
+### unsubscribe(element, handler)
+Unsubscribe the provided handler from updates on a given element. See Boxizer.prototype.unsubscribe() for more information.
 
 ___
 
-### class Boxizer( [\<Object> options] )
+### class Boxizer([options])
 The Boxizer class manages a list of subscriptions by element.
 
-#### @param optional \<Object> options
-General Boxizer configuration. Takes the following properties:
-* `<int> frameLimit`: The maximum number of elements to check per frame. When the number of element subscriptions surpasses this amount, element checks will be split evenly between multiple frames. Defaults to `1028`
+Constructor Parameters
+* `optional <Object> options`: a general configuration object with the following properties:
+  * `<int> frameLimit`: The maximum number of elements to check per frame. When the number of element subscriptions surpasses this amount, element checks will be split evenly between multiple frames. Defaults to `1024`
 
-#### @method subscribe( \<Element> element, \<function> handler, [\<Object> options] )
+#### Boxizer.prototype.subscribe(element, handler, [options])
 Subscribe to a change in the provided element's bounding box.
 
-##### @param \<Element> element
-The element to watch for changes
+Parameters
+* `@param <Element> element`: The element to watch for changes
+* `@param <Function> handler(<object> eventData)`: The handler to be called on change. Receives an eventData object with three properties:
+  * `<Element> element`: The element that changed,
+  * `<DOMRect> from`: The old bounding box
+  * `<DOMRect> to`: The current bounding box
+* `@param optional <Object> options`: Configuration for this handler. Takes the following properties:
+  * `<bool> size`: Respond to changes in element size. Defaults to `true`.
+  * `<bool> positin`: Respond to changes in element position. Defaults to `false`.
 
-##### @param \<Function> handler(\<object> eventData)
-The handler to be called on change. Receives an eventData object with three parameters:
-* `<Element> element`: The element that changed,
-* `<DOMRect> from`: The old bounding box
-* `<DOMRect> to`: The current bounding box
+Return
+* `@return <Function> unsubscribe`: A function that destroys this subscription. Takes no arguments and returns nothing.
 
-##### @param optional \<Object> options
-Configuration for this handler:
-* `<bool> size`: Respond to changes in element size. Defaults to `true`.
-* `<bool> positin`: Respond to changes in element position. Defaults to `false`.
-
-##### @return \<Function> unsubscribe()
-A function that destroys this subscription. Takes no arguments. Returns nothing.
-```
-var unsubscribe = subscribe(element, handler) // Listening
-unsubscribe() // No longer listening
-```
-
-#### unsubscribe( \<Element> element, \<function> handler )
+### Boxizer.prototype.unsubscribe(element, handler)
 Remove the provided handler from the provided element.
 
-##### @param \<Element> element
-The element that's being watched
-
-##### @param \<Function> handler
-The handler to remove.
+Parameters
+* `@param <Element> element`: The element that's being watched
+* `@param <Function> handler`: The handler to remove.
 
 ## Issues
 Submit issues to the [Boxizer GitHub issue tracker](https://github.com/conlanpatrek/boxizer/issues)
