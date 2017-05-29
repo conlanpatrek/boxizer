@@ -63,7 +63,7 @@ BoundingBoxSubscription.prototype.check = function check() {
   this._box = _box;
 };
 
-var MAX_CHECKS_PER_FRAME = 1028;
+var MAX_CHECKS_PER_FRAME = 1024;
 
 function Boxizer ({ frameLimit = MAX_CHECKS_PER_FRAME } = {}) {
   this._subscriptions = [];
@@ -74,7 +74,7 @@ function Boxizer ({ frameLimit = MAX_CHECKS_PER_FRAME } = {}) {
 }
 
 Boxizer.prototype.subscribe = function subscribe(element, handler, options) {
-  let subscription = this._subscriptions.find(function (sub) { return sub.element === element });
+  var subscription = this._subscriptions.find(function (sub) { return sub.element === element });
   if (!subscription) {
     subscription = new BoundingBoxSubscription(element);
     this._subscriptions.push(subscription);
