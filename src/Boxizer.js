@@ -11,17 +11,31 @@ export function Boxizer ({ frameLimit = MAX_CHECKS_PER_FRAME } = {}) {
   this.tick = this.tick.bind(this)
 }
 
-Boxizer.prototype.subscribe = function subscribe(element, handler, exact = false) {
-  this._subscriptions.push(new BoundingBoxSubscription(element, handler, exact))
+Boxizer.prototype.subscribe = function subscribe(element, handler, options) {
+  let subscription = this._subscriptions.find(function (sub) { return sub.element === element })
+  if (!subscription) {
+    subscription = new BoundingBoxSubscription(element)
+    this._subscriptions.push(subscription)
+  }
+
+  subscription.addHandler(handler, options)
+
   this._numChunks = Math.ceil(this._subscriptions.length / this._frameLimit)
   if (!this._unloop) {
     this._unloop = loop(this.tick)
   }
-  return this.removeHandler.bind(this, handler)
+  return this.unsubscribe.bind(this, subscription, handler)
 }
 
-Boxizer.prototype.removeHandler = function removeHandler(handler) {
-  this._subscriptions = this._subscriptions.filter(function(sub) { return sub._handler !== handler })
+Boxizer.prototype.unsubscribe = function unsubscribe(element, handler) {
+  var subscription = element instanceof BoundingBoxSubscription ? element : this._subscriptions.find(function(sub) { return sub.element === element })
+  if (subscription) {
+    subscription.removeHandler(handler)
+    if (subscription.empty()) {
+      this._subscriptions = this._subscriptions.filter(function (sub) { return sub !== subscription })
+    }
+  }
+
   this._numChunks = Math.ceil(this._subscriptions.length / this._frameLimit)
   if (this._subscriptions.length === 0 && this._unloop) {
     this._unloop()

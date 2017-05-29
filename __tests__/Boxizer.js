@@ -3,16 +3,14 @@ let cloop = require('cloop')
 
 jest.mock('cloop')
 
-const mockRect = (w, h, l, t) => ({
+const mockRect = (w = 100, h = 100, x = 0, y = 0) => ({
   width: w,
   height: h,
-  left: l,
-  top: t,
-  right: l + w,
-  bottom: t + h
+  x: x,
+  y: y
 })
-const mockElement = (w, h, l, t) => ({
-  rect: mockRect(w, h, l, t),
+const mockElement = (w, h, x, y) => ({
+  rect: mockRect(w, h, x, y),
   getBoundingClientRect() { return this.rect; }
 })
 
@@ -21,7 +19,7 @@ describe('Boxizer', () => {
   let element
   let handler
   beforeEach(() => {
-    element = mockElement(100, 100, 0, 0)
+    element = mockElement()
     boxizer = new Boxizer()
     handler = jest.fn()
     jest.resetAllMocks()
@@ -37,7 +35,7 @@ describe('Boxizer', () => {
       expect(boxizer._subscriptions.length).toBe(1)
     })
 
-    it('returns a function that destroys that subscription', () => {
+    it('returns an unsubscribe function', () => {
       let unsubscribe = boxizer.subscribe(element, handler)
       unsubscribe()
       expect(boxizer._subscriptions.length).toBe(0)
@@ -50,7 +48,7 @@ describe('Boxizer', () => {
     })
   })
 
-  describe('removeHandler', () => {
+  describe('unsubscribe', () => {
     let stopLoop
     beforeEach(() => {
       stopLoop = jest.fn()
@@ -58,14 +56,14 @@ describe('Boxizer', () => {
       boxizer.subscribe(element, handler)
     })
 
-    it('removes a subscription from the list by its handler', () => {
-      boxizer.removeHandler(handler)
+    it('removes a subscription from the list by its element and handler', () => {
+      boxizer.unsubscribe(element, handler)
       expect(boxizer._subscriptions.length).toBe(0)
     })
 
     it('stops the loop if there are no other subscriptions', () => {
       expect(stopLoop).not.toHaveBeenCalled()
-      boxizer.removeHandler(handler)
+      boxizer.unsubscribe(element, handler)
       expect(stopLoop).toHaveBeenCalled()
     })
   })
@@ -79,8 +77,8 @@ describe('Boxizer', () => {
       element.rect = mockRect(
         element.rect.width + 20,
         element.rect.height,
-        element.rect.left,
-        element.rect.top
+        element.rect.x,
+        element.rect.y
       )
        boxizer.tick()
       expect(handler).toHaveBeenCalled()
@@ -90,8 +88,8 @@ describe('Boxizer', () => {
       element.rect = mockRect(
         element.rect.width,
         element.rect.height,
-        element.rect.left + 20,
-        element.rect.top
+        element.rect.x + 20,
+        element.rect.y
       )
       boxizer.tick()
       expect(handler).not.toHaveBeenCalled()
@@ -99,9 +97,9 @@ describe('Boxizer', () => {
   })
 
 
-  describe('exact mode', () => {
+  describe('position option', () => {
     beforeEach(() => {
-      boxizer.subscribe(element, handler, true)
+      boxizer.subscribe(element, handler, { position: true })
       boxizer.tick()
     })
 
@@ -109,8 +107,8 @@ describe('Boxizer', () => {
       element.rect = mockRect(
         element.rect.width + 20,
         element.rect.height,
-        element.rect.left,
-        element.rect.top
+        element.rect.x,
+        element.rect.y
       )
       boxizer.tick()
       expect(handler).toHaveBeenCalled()
@@ -120,8 +118,8 @@ describe('Boxizer', () => {
       element.rect = mockRect(
         element.rect.width,
         element.rect.height,
-        element.rect.left + 10,
-        element.rect.top
+        element.rect.x + 10,
+        element.rect.y
       )
       boxizer.tick()
       expect(handler).toHaveBeenCalled()
@@ -131,8 +129,8 @@ describe('Boxizer', () => {
       element.rect = mockRect(
         element.rect.width,
         element.rect.height,
-        element.rect.left,
-        element.rect.top
+        element.rect.x,
+        element.rect.y
       )
       boxizer.tick()
       expect(handler).not.toHaveBeenCalled()
@@ -143,7 +141,15 @@ describe('Boxizer', () => {
     let elements = []
     beforeEach(() => {
       boxizer = new Boxizer({frameLimit: 2})
-      elements = [ element, element, element, element, element, element, element ]
+      elements = [
+        mockElement(),
+        mockElement(),
+        mockElement(),
+        mockElement(),
+        mockElement(),
+        mockElement(),
+        mockElement()
+      ]
       elements.forEach((element, i) => {
         // Passing the index along so we can see which one in the list gets called.
         boxizer.subscribe(element, handler.bind(null, i))
@@ -154,8 +160,8 @@ describe('Boxizer', () => {
         element.rect = mockRect(
           element.rect.width + 20,
           element.rect.height,
-          element.rect.left,
-          element.rect.top
+          element.rect.x,
+          element.rect.y
         )
       })
     })
@@ -195,8 +201,8 @@ describe('Boxizer', () => {
         element.rect = mockRect(
           element.rect.width + 20,
           element.rect.height,
-          element.rect.left,
-          element.rect.top
+          element.rect.x,
+          element.rect.y
         )
       })
 
