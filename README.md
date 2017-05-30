@@ -34,12 +34,12 @@ Note that a bounding box is relative to the viewport, so scroling will be consid
 
 ## API
 ### subscribe(element, handler, [options])
-Subcribe to changes in an element's width, height, or position using a singleton instance of the Boxizer class. See Boxizer.prototype.subscribe() for more information.
+Subcribe to changes in an element's width, height, or position using the provided Boxizer singleton. See Boxizer.prototype.subscribe() for more information.
 
 ---
 
 ### unsubscribe(element, handler)
-Unsubscribe the provided handler from updates on a given element. See Boxizer.prototype.unsubscribe() for more information.
+Unsubscribe the provided handler from updates on a given element using the provided Boxizer singleton. See Boxizer.prototype.unsubscribe() for more information.
 
 ___
 
@@ -50,7 +50,7 @@ Constructor Parameters
 * `optional <Object> options`: a general configuration object with the following properties:
   * `<int> frameLimit`: The maximum number of elements to check per frame. When the number of element subscriptions surpasses this amount, element checks will be split evenly between multiple frames. Defaults to `1024`
 
-#### Boxizer.prototype.subscribe(element, handler, [options])
+### Boxizer.prototype.subscribe(element, handler, [options])
 Subscribe to a change in the provided element's bounding box.
 
 Parameters
