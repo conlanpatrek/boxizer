@@ -1,10 +1,10 @@
 {
   "name": "boxizer",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Subscribe to changes in an element's bounding box",
   "repository": "conlanpatrek/boxizer",
   "main": "dist/boxizer.js",
-  "module": "dist/index.es.js",
+  "module": "dist/boxizer.es.js",
   "author": "Conlan Patrek Craft",
   "scripts": {
     "test": "jest",
